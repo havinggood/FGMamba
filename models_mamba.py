@@ -1,6 +1,5 @@
 # Copyright (c) 2015-present, Facebook, Inc.
 # All rights reserved.
-# mffa(fem) + dynamicFilter
 import torch
 import torch.nn as nn
 from functools import partial
@@ -15,7 +14,7 @@ from timm.models.layers import DropPath, to_2tuple
 from timm.models.vision_transformer import _load_weights
 from .FDConv import FDConv
 import math
-from .DynamicFilter import DynamicFilter
+from .DFF import DFF
 from collections import namedtuple
 
 from mamba_ssm.modules.mamba_simple import Mamba
@@ -286,12 +285,12 @@ class VisionMamba(nn.Module):
         self.use_middle_cls_token = use_middle_cls_token
         self.norm = nn.LayerNorm(384, eps=norm_epsilon, **factory_kwargs)
         self.num_tokens = 1 if if_cls_token else 0
-        self.dynamic_filter16 = DynamicFilter(
+        self.dynamic_filter16 = DFF(
             dim=384,        # 匹配embed_dim
             size=16,        # 网格大小 16x16
             weight_resize=False
         )
-        self.dynamic_filter8 = DynamicFilter(
+        self.dynamic_filter8 = DFF(
             dim=384,        # 匹配embed_dim
             size=8,        # 网格大小 16x16
             weight_resize=False
